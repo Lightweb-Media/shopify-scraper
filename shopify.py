@@ -168,8 +168,13 @@ if __name__ == '__main__':
     parser.add_option("--collections", "-c", dest="collections",
                       default="",
                       help="Download products only from the given collections (comma separated)")
+
+    parser.add_option("--export", "-e", dest="export",
+                      default="products.csv",
+                      help="export file name")
     (options, args) = parser.parse_args()
     if len(args) > 0:
+
         url = fix_url(args[0])
         if options.list_collections:
             for col in get_page_collections(url):
@@ -178,4 +183,4 @@ if __name__ == '__main__':
             collections = []
             if options.collections:
                 collections = options.collections.split(',')
-            extract_products(url, 'products.csv', collections)
+            extract_products(url, options.export, collections)

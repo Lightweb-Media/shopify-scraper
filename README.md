@@ -17,4 +17,7 @@ python3 shopify.py -c col1,col2,col3 [site's url]
 Example:
 python3 shopify.py -c vip,babs-and-bab-lows https://www.greats.com
 
-The products get saved into a file named products.csv in the current directory.
+The products get savedn default into a file named products.csv in the current directory.
+if you want another destination, use:
+
+python3 shopify.py -e example.csv https://www.greats.com
