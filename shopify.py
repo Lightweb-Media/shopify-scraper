@@ -15,6 +15,7 @@ def get_page(url, page, collection_handle=None):
     if collection_handle:
         full_url += '/collections/{}'.format(collection_handle)
     full_url += '/products.json'
+
     req = urllib.request.Request(
         full_url + '?page={}'.format(page),
         data=None,
@@ -25,6 +26,7 @@ def get_page(url, page, collection_handle=None):
     while True:
         try:
             data = urllib.request.urlopen(req).read()
+
             break
         except HTTPError:
             print('Blocked! Sleeping...')
@@ -32,6 +34,7 @@ def get_page(url, page, collection_handle=None):
             print('Retrying')
         
     products = json.loads(data.decode())['products']
+    
     return products
 
 
@@ -89,7 +92,7 @@ def extract_products_collection(url, col):
             product_type = product['product_type']
             product_url = url + '/products/' + product['handle']
             product_handle = product['handle']
-
+            product_id = str(product['id'])
             def get_image(variant_id):
                 images = product['images']
                 for i in images:
@@ -116,7 +119,7 @@ def extract_products_collection(url, col):
                 if not variant['available']:
                     stock = 'No'
 
-                row = {'sku': sku, 'product_type': product_type,
+                row = {'ID':product_id, 'sku': sku, 'product_type': product_type,
                        'title': title, 'option_value': option_value,
                        'price': price, 'stock': stock, 'body': str(product['body_html']),
                        'variant_id': product_handle + str(variant['id']),
@@ -132,7 +135,7 @@ def extract_products_collection(url, col):
 def extract_products(url, path, collections=None):
     with open(path, 'w') as f:
         writer = csv.writer(f)
-        writer.writerow(['Code', 'Collection', 'Category',
+        writer.writerow(['ID','Code', 'Collection', 'Category',
                          'Name', 'Variant Name',
                          'Price', 'In Stock', 'URL', 'Image URL', 'Body'])
         seen_variants = set()
@@ -142,12 +145,14 @@ def extract_products(url, path, collections=None):
             handle = col['handle']
             title = col['title']
             for product in extract_products_collection(url, handle):
+                
+                
                 variant_id = product['variant_id']
                 if variant_id in seen_variants:
                     continue
 
                 seen_variants.add(variant_id)
-                writer.writerow([product['sku'], str(title),
+                writer.writerow([product['ID'],product['sku'], str(title),
                                  product['product_type'],
                                  product['title'], product['option_value'],
                                  product['price'],
